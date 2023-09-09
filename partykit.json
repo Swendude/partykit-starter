@@ -1,0 +1,4 @@
+{
+  "name": "partykit-starter-party",
+  "main": "party/index.ts"
+}
