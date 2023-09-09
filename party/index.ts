@@ -6,7 +6,7 @@ import type {
   PartyWorker,
 } from "partykit/server";
 
-import { gameUpdater, initialGame, Action } from "../game/logic";
+import { gameUpdater, initialGame, Action, ServerAction } from "../game/logic";
 import { GameState } from "../game/types";
 
 interface ServerMessage {
@@ -17,7 +17,9 @@ export default class Server implements PartyServer {
   private gameState: GameState;
 
   constructor(readonly party: Party) {
-    this.gameState = initialGame;
+    this.gameState = initialGame();
+    console.log("Room created:", party.id);
+    console.log("Room target", this.gameState.target);
     // party.storage.put;
   }
   onConnect(connection: PartyConnection, ctx: PartyConnectionContext) {
@@ -41,9 +43,15 @@ export default class Server implements PartyServer {
     );
     this.party.broadcast(JSON.stringify(this.gameState));
   }
-  // onMessage(message: string, sender: PartyConnection) {
-  //   this.party.broadcast(`${sender.id}: ${message}`, []);
-  // }
+  onMessage(message: string, sender: PartyConnection) {
+    const action: ServerAction = {
+      ...(JSON.parse(message) as Action),
+      user: { id: sender.id },
+    };
+    console.log(action);
+    this.gameState = gameUpdater(action, this.gameState);
+    this.party.broadcast(JSON.stringify(this.gameState));
+  }
 }
 
 Server satisfies PartyWorker;

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:server": "partykit dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

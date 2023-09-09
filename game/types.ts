@@ -4,6 +4,9 @@ export interface User {
 
 interface BaseGameState {
   users: User[];
+  log: string[];
 }
 
-export interface GameState extends BaseGameState {}
+export interface GameState extends BaseGameState {
+  target: number;
+}
