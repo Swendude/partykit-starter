@@ -13,7 +13,7 @@ const Game = ({ username, roomId }: GameProps) => {
   const [gameState, setGameState] = useState<GameState | null>(null);
 
   const socket = usePartySocket({
-    host: "127.0.0.1:1999",
+    host: process.env.SERVER_URL || "127.0.0.1:1999",
     room: roomId,
     id: username,
     onMessage(event: MessageEvent<string>) {
