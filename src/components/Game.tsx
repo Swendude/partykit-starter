@@ -40,14 +40,27 @@ const Game = ({ username, roomId }: GameProps) => {
     );
   }
 
+  const handleGuess = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+    dispatch({ type: "guess", guess: guess });
+  };
+
   return (
-    <Layout>
-      <h1 className="text-2xl border-b border-yellow-400">
+    <>
+      <h1 className="text-2xl border-b border-yellow-400 text-center relative">
         🎲 Guess the number!
       </h1>
       <section>
-        <div className="flex flex-col gap-4 py-6 items-center">
-          <div>{guess}</div>
+        <form
+          className="flex flex-col gap-4 py-6 items-center"
+          onSubmit={handleGuess}
+        >
+          <label
+            htmlFor="guess"
+            className="text-7xl font-bold text-stone-50 bg-black rounded p-2 text-"
+          >
+            {guess}
+          </label>
           <input
             type="range"
             name="guess"
@@ -56,21 +69,21 @@ const Game = ({ username, roomId }: GameProps) => {
             onChange={(e) => setGuess(Number(e.currentTarget.value))}
             value={guess}
           />
-          <button
-            className="rounded border  p-5 bg-yellow-400 group text-black shadow hover:shadow-lg transition-all duration-200 hover:scale-125"
-            onClick={() => dispatch({ type: "guess", guess: guess })}
-          >
+          <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:shadow-lg transition-all duration-200 hover:animate-wiggle">
             Guess!
           </button>
-        </div>
-        <div className="border-t-2 border-yellow-400 py-2" />
-        <div className="h-24 bg-yellow-100 flex flex-col">
-          {gameState.log.map((l) => (
-            <p key={l} className="transition-all">
-              {l}
+        </form>
+
+        <div className="border-t border-yellow-400 py-2" />
+
+        <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
+          {gameState.log.map((logEntry, i) => (
+            <p key={logEntry.dt} className="animate-appear text-black">
+              {logEntry.message}
             </p>
           ))}
         </div>
+
         <h2 className="text-lg">
           Players in room <span className="font-bold">{roomId}</span>
         </h2>
@@ -87,7 +100,7 @@ const Game = ({ username, roomId }: GameProps) => {
           })}
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 
