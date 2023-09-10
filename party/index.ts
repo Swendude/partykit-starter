@@ -1,10 +1,4 @@
-import type {
-  Party,
-  PartyConnection,
-  PartyConnectionContext,
-  PartyServer,
-  PartyWorker,
-} from "partykit/server";
+import type * as Party from "partykit/server";
 
 import { gameUpdater, initialGame, Action, ServerAction } from "../game/logic";
 import { GameState } from "../game/logic";
@@ -13,16 +7,16 @@ interface ServerMessage {
   state: GameState;
 }
 
-export default class Server implements PartyServer {
+export default class Server implements Party.Server {
   private gameState: GameState;
 
-  constructor(readonly party: Party) {
+  constructor(readonly party: Party.Party) {
     this.gameState = initialGame();
     console.log("Room created:", party.id);
     console.log("Room target", this.gameState.target);
     // party.storage.put;
   }
-  onConnect(connection: PartyConnection, ctx: PartyConnectionContext) {
+  onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
     // A websocket just connected!
 
     // let's send a message to the connection
@@ -33,7 +27,7 @@ export default class Server implements PartyServer {
     );
     this.party.broadcast(JSON.stringify(this.gameState));
   }
-  onClose(connection: PartyConnection) {
+  onClose(connection: Party.Connection) {
     this.gameState = gameUpdater(
       {
         type: "UserExit",
@@ -43,7 +37,7 @@ export default class Server implements PartyServer {
     );
     this.party.broadcast(JSON.stringify(this.gameState));
   }
-  onMessage(message: string, sender: PartyConnection) {
+  onMessage(message: string, sender: Party.Connection) {
     const action: ServerAction = {
       ...(JSON.parse(message) as Action),
       user: { id: sender.id },
@@ -54,4 +48,4 @@ export default class Server implements PartyServer {
   }
 }
 
-Server satisfies PartyWorker;
+Server satisfies Party.Worker;
