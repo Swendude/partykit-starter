@@ -7,7 +7,7 @@ import type {
 } from "partykit/server";
 
 import { gameUpdater, initialGame, Action, ServerAction } from "../game/logic";
-import { GameState } from "../game/types";
+import { GameState } from "../game/logic";
 
 interface ServerMessage {
   state: GameState;
@@ -48,7 +48,7 @@ export default class Server implements PartyServer {
       ...(JSON.parse(message) as Action),
       user: { id: sender.id },
     };
-    console.log(action);
+    console.log(`Received action ${action.type} from user ${sender.id}`);
     this.gameState = gameUpdater(action, this.gameState);
     this.party.broadcast(JSON.stringify(this.gameState));
   }

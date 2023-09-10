@@ -1,21 +1,44 @@
-import { GameState, User } from "./types";
+// If there is anything you want to track for a specific user, change this interface
+export interface User {
+  id: string;
+}
 
+// Do not change this! Every game has a list of users and log of actions
+interface BaseGameState {
+  users: User[];
+  log: {
+    dt: number;
+    message: string;
+  }[];
+}
+
+type WithUser<T> = T & { user: User };
+
+export type DefaultAction = { type: "UserEntered" } | { type: "UserExit" };
+
+// This interface holds all the information about your game
+export interface GameState extends BaseGameState {
+  target: number;
+}
+
+// This is how a fresh new game starts out, it's a function so you can make it dynamic!
+// In the case of the guesser game we start out with a random target
 export const initialGame: () => GameState = () => ({
   users: [],
   target: Math.floor(Math.random() * 100),
   log: addLog("Game Created!", []),
 });
 
-type WithUser<T> = T & { user: User };
+// Here are all the actions we can dispatch for a user
+type GameAction = { type: "guess"; guess: number };
 
-export type DefaultAction = { type: "UserEntered" } | { type: "UserExit" };
+// Do not change!
+export type Action = DefaultAction | GameAction;
 
-type GameActions = { type: "guess"; guess: number };
+// Do not change!
+export type ServerAction = WithUser<DefaultAction> | WithUser<GameAction>;
 
-export type Action = DefaultAction | GameActions;
-
-export type ServerAction = WithUser<DefaultAction> | WithUser<GameActions>;
-
+// The maximum log size, change as needed
 const MAX_LOG_SIZE = 4;
 
 // util for easy adding logs
@@ -30,6 +53,12 @@ export const gameUpdater = (
   action: ServerAction,
   state: GameState
 ): GameState => {
+  // This switch should have a case for every action type you add.
+
+  // "UserEntered" & "UserExit" are defined by default
+
+  // Every action has a user field that represent the user who dispatched the action,
+  // you don't need to add this yourself
   switch (action.type) {
     case "UserEntered":
       return {
@@ -37,14 +66,15 @@ export const gameUpdater = (
         users: [...state.users, action.user],
         log: addLog(`user ${action.user.id} joined 🎉`, state.log),
       };
+
     case "UserExit":
       return {
         ...state,
         users: state.users.filter((user) => user.id !== action.user.id),
         log: addLog(`user ${action.user.id} left 😢`, state.log),
       };
+
     case "guess":
-      console.log(action.guess, state.target);
       if (action.guess === state.target) {
         return {
           ...state,

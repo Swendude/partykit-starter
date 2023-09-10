@@ -1,8 +1,5 @@
-import usePartySocket from "partysocket/react";
 import { useState } from "react";
-import Layout from "./Layout";
-import { GameState } from "../../game/types";
-import { Action } from "../../game/logic";
+import { useGameRoom } from "@/hooks/useGameRoom";
 
 interface GameProps {
   username: string;
@@ -10,23 +7,12 @@ interface GameProps {
 }
 
 const Game = ({ username, roomId }: GameProps) => {
-  const [gameState, setGameState] = useState<GameState | null>(null);
+  const { gameState, dispatch } = useGameRoom(username, roomId);
 
-  const socket = usePartySocket({
-    host: process.env.NEXT_PUBLIC_SERVER_URL || "127.0.0.1:1999",
-    room: roomId,
-    id: username,
-    onMessage(event: MessageEvent<string>) {
-      setGameState(JSON.parse(event.data));
-    },
-  });
-
-  const dispatch = (action: Action) => {
-    socket.send(JSON.stringify(action));
-  };
-
+  // Local state to use for the UI
   const [guess, setGuess] = useState<number>(0);
 
+  // Indicated that the game is loading
   if (gameState === null) {
     return (
       <p>
@@ -40,6 +26,8 @@ const Game = ({ username, roomId }: GameProps) => {
 
   const handleGuess = (event: React.SyntheticEvent) => {
     event.preventDefault();
+    // Dispatch allows you to send an action!
+    // Modify /game/logic.ts to change what actions you can send
     dispatch({ type: "guess", guess: guess });
   };
 
