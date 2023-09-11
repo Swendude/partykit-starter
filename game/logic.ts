@@ -1,3 +1,20 @@
+import { RandomMemes } from "@/components/Game";
+import memes from "@/pages/data/memes.json";
+import { useState } from "react";
+
+export const randomMeme = () => {
+  // const [memes, setMemes] = useState([]);
+
+  const shuffledMemes = memes.sort(() => 0.5 - Math.random()); // Shuffle the memes
+  const firstThreeMemes = shuffledMemes.slice(0, 3); // Get the first three memes
+  // setMemes(firstThreeMemes);
+  // console.log(firstThreeMemes);
+
+  return firstThreeMemes;
+};
+
+console.log(randomMeme());
+
 // util for easy adding logs
 const addLog = (message: string, logs: GameState["log"]): GameState["log"] => {
   return [{ dt: new Date().getTime(), message: message }, ...logs].slice(
@@ -13,6 +30,7 @@ export interface User {
 
 // Do not change this! Every game has a list of users and log of actions
 interface BaseGameState {
+  memes: RandomMemes[];
   users: User[];
   log: {
     dt: number;
@@ -41,15 +59,21 @@ export interface GameState extends BaseGameState {
 // This is how a fresh new game starts out, it's a function so you can make it dynamic!
 // In the case of the guesser game we start out with a random target
 export const initialGame = () => ({
+  // const [randomMeme, setRandomMemes] = useState([]),
+  memes: randomMeme(),
+
+  // const shuffledMemes = memes.sort(() => 0.5 - Math.random()); // Shuffle the memes
+  // const firstThreeMemes = shuffledMemes.slice(0, 3); // Get the first three memes
+  // setMemes(firstThreeMemes)
+
   users: [],
-  target: Math.floor(Math.random() * 100),
+  // target:
+  target: Math.floor(Math.random() * 2),
   log: addLog("🐄 Game Created!", []),
 });
 
 // Here are all the actions we can dispatch for a user
-type GameAction =
-  | { type: "guess"; guess: number }
-  | { type: "bet"; amount: number };
+type GameAction = { type: "guess"; guess: number };
 
 export const gameUpdater = (
   action: ServerAction,
@@ -75,21 +99,14 @@ export const gameUpdater = (
         users: state.users.filter((user) => user.id !== action.user.id),
         log: addLog(`user ${action.user.id} left 😢`, state.log),
       };
-    case "bet":
-      return {
-        ...state,
-        log: addLog(
-          `user ${action.user.id} betted ${action.amount}!`,
-          state.log
-        ),
-      };
+
     case "guess":
       if (action.guess === state.target) {
         return {
           ...state,
-          target: Math.floor(Math.random() * 100),
+          target: Math.floor(Math.random() * 2),
           log: addLog(
-            `user ${action.user.id} guessed ${action.guess} and won! 👑`,
+            `user ${action.user.id} answered ${action.guess} and won! 👑`,
             state.log
           ),
         };
@@ -97,7 +114,7 @@ export const gameUpdater = (
         return {
           ...state,
           log: addLog(
-            `user ${action.user.id} guessed ${action.guess}`,
+            `user ${action.user.id} answered ${action.guess}`,
             state.log
           ),
         };

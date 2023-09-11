@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGameRoom } from "@/hooks/useGameRoom";
+import { randomMeme } from "../../game/logic";
 
 interface GameProps {
   username: string;
   roomId: string;
 }
 
+export interface RandomMemes {
+  id: string;
+  name: string;
+  url: string;
+  width?: number;
+  height?: number;
+  box_count?: number;
+  captions?: number;
+}
+
 const Game = ({ username, roomId }: GameProps) => {
   const { gameState, dispatch } = useGameRoom(username, roomId);
-
+  console.log(gameState);
   // Local state to use for the UI
   const [guess, setGuess] = useState<number>(0);
+
+  // const [randomMemes, setRandomMemes] = useState<RandomMemes[] | []>([]);
+
+  // useEffect(() => {
+  //   const random = randomMeme();
+  //   if (random) {
+  //     setRandomMemes(random);
+  //   } else {
+  //     return;
+  //   }
+  // }, []);
 
   // Indicated that the game is loading
   if (gameState === null) {
@@ -36,6 +58,15 @@ const Game = ({ username, roomId }: GameProps) => {
       <h1 className="text-2xl border-b border-yellow-400 text-center relative">
         🎲 Guess the number!
       </h1>
+      {gameState.memes.map((meme) => {
+        return (
+          <div key={meme.id}>
+            <p>{meme.name}</p>
+            <img src={meme.url} />
+          </div>
+        );
+      })}
+
       <section>
         <form
           className="flex flex-col gap-4 py-6 items-center"
@@ -45,10 +76,38 @@ const Game = ({ username, roomId }: GameProps) => {
             htmlFor="guess"
             className="text-7xl font-bold text-stone-50 bg-black rounded p-2 text-"
           >
-            {guess}
+            Random Meme 1
           </label>
           <input
-            type="range"
+            type="radio"
+            name="guess"
+            id="guess"
+            className="opacity-70 hover:opacity-100 accent-yellow-400"
+            onChange={(e) => setGuess(Number(e.currentTarget.value))}
+            value={guess}
+          />
+          <label
+            htmlFor="guess"
+            className="text-7xl font-bold text-stone-50 bg-black rounded p-2 text-"
+          >
+            Random Meme 2
+          </label>
+          <input
+            type="radio"
+            name="guess"
+            id="guess"
+            className="opacity-70 hover:opacity-100 accent-yellow-400"
+            onChange={(e) => setGuess(Number(e.currentTarget.value))}
+            value={guess}
+          />
+          <label
+            htmlFor="guess"
+            className="text-7xl font-bold text-stone-50 bg-black rounded p-2 text-"
+          >
+            Random Meme 3
+          </label>
+          <input
+            type="radio"
             name="guess"
             id="guess"
             className="opacity-70 hover:opacity-100 accent-yellow-400"
@@ -61,12 +120,12 @@ const Game = ({ username, roomId }: GameProps) => {
         </form>
 
         <div className="border-t border-yellow-400 py-2" />
-        <button
+        {/* <button
           className="border border-black p-5"
           onClick={() => dispatch({ type: "bet", amount: 100 })}
         >
           Bet!
-        </button>
+        </button> */}
 
         <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
           {gameState.log.map((logEntry, i) => (
