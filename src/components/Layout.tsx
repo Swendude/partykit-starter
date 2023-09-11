@@ -17,10 +17,8 @@ const Layout = ({ children }: LayoutProps) => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <main
-      className={`${fira.className} grid place-content-center h-screen flex-row bg-background w-screen`}
-    >
-      <Card className="max-w-[65rem] w-fit">
+    <main className={`${fira.className} bg-background`}>
+      <Card className="max-w-[65rem] w-fit mx-auto mt-16">
         <CardHeader>
           <div className="flex justify-between items-end">
             <CardTitle>{"Liar's Dice"}</CardTitle>

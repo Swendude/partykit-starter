@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GameSetup, setupValidator } from "@/pages";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -26,6 +25,7 @@ export const Portal = ({
       roomId: "",
     },
   });
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(setSetup)} className="space-y-8">

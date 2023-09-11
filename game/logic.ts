@@ -16,6 +16,12 @@ const addLog = (message: string, logs: GameState["log"]): GameState["log"] => {
 // If bidder matched: wins
 // all losers remove 1 dice
 
+export type Dice =
+  | { status: "removed" }
+  | { status: "rolled"; value: (typeof DICE_FACES)[number] };
+
+const DICE_FACES: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+
 // If there is anything you want to track for a specific user, change this interface
 export interface User {
   id: string;
@@ -43,10 +49,15 @@ type WithUser<T> = T & { user: User };
 
 export type DefaultAction = { type: "UserEntered" } | { type: "UserExit" };
 
+interface UserInfo {
+  dice: null | [Dice, Dice, Dice, Dice, Dice];
+}
+
 // This interface holds all the information about your game
 export interface GameState extends BaseGameState {
   target: number;
   currentUser: User["id"] | null; //null means game not started
+  userInfo: Record<User["id"], UserInfo>;
   rootError: string | null;
 }
 
@@ -54,6 +65,7 @@ export interface GameState extends BaseGameState {
 // In the case of the guesser game we start out with a random target
 export const initialGame = (): GameState => ({
   users: [],
+  userInfo: {},
   currentUser: null,
   target: Math.floor(Math.random() * 100),
   log: [{ dt: 0, message: "Game Created!" }],
@@ -61,20 +73,35 @@ export const initialGame = (): GameState => ({
 });
 
 // Here are all the actions we can dispatch for a user
-type GameAction = { type: "guess"; guess: number } | { type: "startGame" };
+type GameAction = { type: "startGame" };
+
+const randomChoice = <T>(a: T[]): T => {
+  return a[Math.floor(Math.random() * a.length)];
+};
+
+const rollDice = (dice: UserInfo["dice"]): UserInfo["dice"] => {
+  if (dice === null) {
+    return [
+      { status: "rolled", value: randomChoice(DICE_FACES) },
+      { status: "rolled", value: randomChoice(DICE_FACES) },
+      { status: "rolled", value: randomChoice(DICE_FACES) },
+      { status: "rolled", value: randomChoice(DICE_FACES) },
+      { status: "rolled", value: randomChoice(DICE_FACES) },
+    ];
+  }
+  const newDice = dice.map((d) => {
+    if (d.status !== "removed") {
+      return { status: "rolled", value: randomChoice(DICE_FACES) };
+    }
+    return d;
+  }) as [Dice, Dice, Dice, Dice, Dice];
+  return newDice;
+};
 
 export const gameUpdater = (
   action: ServerAction,
   state: GameState
 ): GameState => {
-  // This switch should have a case for every action type you add.
-
-  // "UserEntered" & "UserExit" are defined by default
-
-  // Every action has a user field that represent the user who dispatched the action,
-  // you don't need to add this yourself
-
-  // Reset the error before handling any actions
   state.rootError = null;
 
   switch (action.type) {
@@ -82,6 +109,7 @@ export const gameUpdater = (
       return {
         ...state,
         users: [...state.users, action.user],
+        userInfo: { ...state.userInfo, [action.user.id]: { dice: null } },
         log: addLog(`user ${action.user.id} joined 🎉`, state.log),
       };
 
@@ -92,35 +120,24 @@ export const gameUpdater = (
         log: addLog(`user ${action.user.id} left 😢`, state.log),
       };
 
-    case "guess":
-      if (action.guess === state.target) {
-        return {
-          ...state,
-          target: Math.floor(Math.random() * 100),
-          log: addLog(
-            `user ${action.user.id} guessed ${action.guess} and won! 👑`,
-            state.log
-          ),
-        };
-      } else {
-        return {
-          ...state,
-          log: addLog(
-            `user ${action.user.id} guessed ${action.guess}`,
-            state.log
-          ),
-        };
-      }
     case "startGame":
       if (state.users.length < 2) {
         return {
           ...state,
-          rootError: "Game can't be started with less than two players",
+          rootError: "Game needs atleast two players",
         };
       } else {
+        let newInfos: GameState["userInfo"] = {};
+        for (const userId in state.userInfo) {
+          newInfos[userId] = {
+            ...state.userInfo[userId],
+            dice: rollDice(state.userInfo[userId].dice),
+          };
+        }
         return {
           ...state,
-          currentUser: state.users[0].id,
+          currentUser: randomChoice(state.users).id,
+          userInfo: { ...newInfos },
         };
       }
   }
