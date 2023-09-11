@@ -10,7 +10,7 @@ const Game = ({ username, roomId }: GameProps) => {
   const { gameState, dispatch } = useGameRoom(username, roomId);
 
   // Local state to use for the UI
-  const [guess, setGuess] = useState<number>(0);
+  const [guess, setGuess] = useState<string>("");
 
   // Indicated that the game is loading
   if (gameState === null) {
@@ -34,7 +34,7 @@ const Game = ({ username, roomId }: GameProps) => {
   return (
     <>
       <h1 className="text-2xl border-b border-yellow-400 text-center relative">
-        🎲 Guess the number!
+        🎲 Guess the letter or the whole word!
       </h1>
       <section>
         <form
@@ -48,11 +48,11 @@ const Game = ({ username, roomId }: GameProps) => {
             {guess}
           </label>
           <input
-            type="range"
+            type="text"
             name="guess"
             id="guess"
             className="opacity-70 hover:opacity-100 accent-yellow-400"
-            onChange={(e) => setGuess(Number(e.currentTarget.value))}
+            onChange={(e) => setGuess(e.currentTarget.value)}
             value={guess}
           />
           <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:shadow-lg transition-all duration-200 hover:animate-wiggle">
@@ -61,12 +61,6 @@ const Game = ({ username, roomId }: GameProps) => {
         </form>
 
         <div className="border-t border-yellow-400 py-2" />
-        <button
-          className="border border-black p-5"
-          onClick={() => dispatch({ type: "bet", amount: 100 })}
-        >
-          Bet!
-        </button>
 
         <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
           {gameState.log.map((logEntry, i) => (

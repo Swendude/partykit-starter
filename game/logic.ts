@@ -47,10 +47,8 @@ export const initialGame = () => ({
 });
 
 // Here are all the actions we can dispatch for a user
-type GameAction =
-  | { type: "guess"; guess: number }
-  | { type: "bet"; amount: number };
-
+type GameAction = { type: "guess"; guess: string };
+/*
 export const gameUpdater = (
   action: ServerAction,
   state: GameState
@@ -61,6 +59,7 @@ export const gameUpdater = (
 
   // Every action has a user field that represent the user who dispatched the action,
   // you don't need to add this yourself
+  
   switch (action.type) {
     case "UserEntered":
       return {
@@ -74,14 +73,6 @@ export const gameUpdater = (
         ...state,
         users: state.users.filter((user) => user.id !== action.user.id),
         log: addLog(`user ${action.user.id} left 😢`, state.log),
-      };
-    case "bet":
-      return {
-        ...state,
-        log: addLog(
-          `user ${action.user.id} betted ${action.amount}!`,
-          state.log
-        ),
       };
     case "guess":
       if (action.guess === state.target) {
@@ -103,4 +94,4 @@ export const gameUpdater = (
         };
       }
   }
-};
+}; */
