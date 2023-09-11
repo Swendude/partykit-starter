@@ -59,9 +59,29 @@ export default function Home() {
   // Show the game after the user has picked a room and a username
   if (setup !== null && setup.showGame && setup.roomId && setup.username) {
     return (
-      <Layout>
-        <Game roomId={setup.roomId} username={setup.username} />
-      </Layout>
+      <>
+        <Layout>
+          <Game roomId={setup.roomId} username={setup.username} />
+          <div className="flex justify-end">
+            <button
+              onClick={() => {
+                router.push({
+                  pathname: "/",
+                  query: null,
+                });
+                setSetup({
+                  username: null,
+                  roomId: null,
+                  showGame: false,
+                });
+              }}
+              className="bg-black rounded p-2 inline-block shadow text-xs text-stone-50 hover:animate-wiggle"
+            >
+              Leave Room
+            </button>
+          </div>
+        </Layout>
+      </>
     );
   }
 

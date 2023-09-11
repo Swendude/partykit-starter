@@ -10,8 +10,10 @@ const config: Config = {
     extend: {
       keyframes: {
         wiggle: {
-          "0%, 100%": { transform: "rotate(-3deg)" },
-          "50%": { transform: "rotate(3deg)" },
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(-5deg)" },
+          "50%": { transform: "rotate(0deg)" },
+          "75%": { transform: "rotate(5deg)" },
         },
         appear: {
           "0%": { opacity: "0" },
@@ -19,7 +21,7 @@ const config: Config = {
         },
       },
       animation: {
-        wiggle: "wiggle 1s ease-in-out infinite",
+        wiggle: "wiggle .5s linear infinite",
         appear: "appear 0.5s ease-in-out forwards",
       },
       backgroundImage: {

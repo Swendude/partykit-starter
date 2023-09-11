@@ -43,13 +43,11 @@ export interface GameState extends BaseGameState {
 export const initialGame = () => ({
   users: [],
   target: Math.floor(Math.random() * 100),
-  log: addLog("🐄 Game Created!", []),
+  log: addLog("Game Created!", []),
 });
 
 // Here are all the actions we can dispatch for a user
-type GameAction =
-  | { type: "guess"; guess: number }
-  | { type: "bet"; amount: number };
+type GameAction = { type: "guess"; guess: number };
 
 export const gameUpdater = (
   action: ServerAction,
@@ -75,14 +73,7 @@ export const gameUpdater = (
         users: state.users.filter((user) => user.id !== action.user.id),
         log: addLog(`user ${action.user.id} left 😢`, state.log),
       };
-    case "bet":
-      return {
-        ...state,
-        log: addLog(
-          `user ${action.user.id} betted ${action.amount}!`,
-          state.log
-        ),
-      };
+
     case "guess":
       if (action.guess === state.target) {
         return {

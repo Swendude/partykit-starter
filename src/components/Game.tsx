@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGameRoom } from "@/hooks/useGameRoom";
+import { stringToColor } from "@/utils";
 
 interface GameProps {
   username: string;
@@ -55,18 +56,12 @@ const Game = ({ username, roomId }: GameProps) => {
             onChange={(e) => setGuess(Number(e.currentTarget.value))}
             value={guess}
           />
-          <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:shadow-lg transition-all duration-200 hover:animate-wiggle">
+          <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:animate-wiggle">
             Guess!
           </button>
         </form>
 
         <div className="border-t border-yellow-400 py-2" />
-        <button
-          className="border border-black p-5"
-          onClick={() => dispatch({ type: "bet", amount: 100 })}
-        >
-          Bet!
-        </button>
 
         <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
           {gameState.log.map((logEntry, i) => (
@@ -83,7 +78,8 @@ const Game = ({ username, roomId }: GameProps) => {
           {gameState.users.map((user) => {
             return (
               <p
-                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-black text-white"
+                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent text-white"
+                style={{ backgroundColor: stringToColor(user.id + roomId) }}
                 key={user.id}
               >
                 {user.id}
