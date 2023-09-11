@@ -1,4 +1,7 @@
 // util for easy adding logs
+
+import { hangmanGame } from "./wordList";
+
 const addLog = (message: string, logs: GameState["log"]): GameState["log"] => {
   return [{ dt: new Date().getTime(), message: message }, ...logs].slice(
     0,
@@ -35,21 +38,21 @@ export type DefaultAction = { type: "UserEntered" } | { type: "UserExit" };
 
 // This interface holds all the information about your game
 export interface GameState extends BaseGameState {
-  target: number;
+  target: string;
 }
 
 // This is how a fresh new game starts out, it's a function so you can make it dynamic!
 // In the case of the guesser game we start out with a random target
 export const initialGame = () => ({
   users: [],
-  target: Math.floor(Math.random() * 100),
-  log: addLog("🐄 Game Created!", []),
+  target:
+    hangmanGame[Math.floor(Math.random() * 30) as keyof typeof hangmanGame],
+  log: addLog("Game Created!", []),
 });
 
 // Here are all the actions we can dispatch for a user
-type GameAction =
-  | { type: "guess"; guess: number }
-  | { type: "bet"; amount: number };
+type GameAction = { type: "guess"; guess: number };
+// | { type: "bet"; amount: number };
 
 export const gameUpdater = (
   action: ServerAction,
@@ -75,19 +78,22 @@ export const gameUpdater = (
         users: state.users.filter((user) => user.id !== action.user.id),
         log: addLog(`user ${action.user.id} left 😢`, state.log),
       };
-    case "bet":
-      return {
-        ...state,
-        log: addLog(
-          `user ${action.user.id} betted ${action.amount}!`,
-          state.log
-        ),
-      };
+    // case "bet":
+    //   return {
+    //     ...state,
+    //     log: addLog(
+    //       `user ${action.user.id} betted ${action.amount}!`,
+    //       state.log
+    //     ),
+    //   };
     case "guess":
       if (action.guess === state.target) {
         return {
           ...state,
-          target: Math.floor(Math.random() * 100),
+          target:
+            hangmanGame[
+              Math.floor(Math.random() * 30) as keyof typeof hangmanGame
+            ],
           log: addLog(
             `user ${action.user.id} guessed ${action.guess} and won! 👑`,
             state.log

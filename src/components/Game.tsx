@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { useGameRoom } from "@/hooks/useGameRoom";
+import Word from "./Word";
 
 interface GameProps {
   username: string;
@@ -34,10 +36,11 @@ const Game = ({ username, roomId }: GameProps) => {
   return (
     <>
       <h1 className="text-2xl border-b border-yellow-400 text-center relative">
-        🎲 Guess the number!
+        🎲 Guess the letter or the whole word!
       </h1>
+      <Word />
       <section>
-        <form
+        {/* <form
           className="flex flex-col gap-4 py-6 items-center"
           onSubmit={handleGuess}
         >
@@ -58,15 +61,15 @@ const Game = ({ username, roomId }: GameProps) => {
           <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:shadow-lg transition-all duration-200 hover:animate-wiggle">
             Guess!
           </button>
-        </form>
+        </form> */}
 
-        <div className="border-t border-yellow-400 py-2" />
+        {/* <div className="border-t border-yellow-400 py-2" />
         <button
           className="border border-black p-5"
           onClick={() => dispatch({ type: "bet", amount: 100 })}
         >
           Bet!
-        </button>
+        </button> */}
 
         <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
           {gameState.log.map((logEntry, i) => (
