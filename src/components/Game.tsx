@@ -61,6 +61,12 @@ const Game = ({ username, roomId }: GameProps) => {
         </form>
 
         <div className="border-t border-yellow-400 py-2" />
+        <button
+          className="border border-black p-5"
+          onClick={() => dispatch({ type: "bet", amount: 100 })}
+        >
+          Bet!
+        </button>
 
         <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
           {gameState.log.map((logEntry, i) => (

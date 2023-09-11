@@ -1,3 +1,11 @@
+// util for easy adding logs
+const addLog = (message: string, logs: GameState["log"]): GameState["log"] => {
+  return [{ dt: new Date().getTime(), message: message }, ...logs].slice(
+    0,
+    MAX_LOG_SIZE
+  );
+};
+
 // If there is anything you want to track for a specific user, change this interface
 export interface User {
   id: string;
@@ -12,6 +20,15 @@ interface BaseGameState {
   }[];
 }
 
+// Do not change!
+export type Action = DefaultAction | GameAction;
+
+// Do not change!
+export type ServerAction = WithUser<DefaultAction> | WithUser<GameAction>;
+
+// The maximum log size, change as needed
+const MAX_LOG_SIZE = 4;
+
 type WithUser<T> = T & { user: User };
 
 export type DefaultAction = { type: "UserEntered" } | { type: "UserExit" };
@@ -23,31 +40,16 @@ export interface GameState extends BaseGameState {
 
 // This is how a fresh new game starts out, it's a function so you can make it dynamic!
 // In the case of the guesser game we start out with a random target
-export const initialGame: () => GameState = () => ({
+export const initialGame = () => ({
   users: [],
   target: Math.floor(Math.random() * 100),
-  log: addLog("Game Created!", []),
+  log: addLog("🐄 Game Created!", []),
 });
 
 // Here are all the actions we can dispatch for a user
-type GameAction = { type: "guess"; guess: number };
-
-// Do not change!
-export type Action = DefaultAction | GameAction;
-
-// Do not change!
-export type ServerAction = WithUser<DefaultAction> | WithUser<GameAction>;
-
-// The maximum log size, change as needed
-const MAX_LOG_SIZE = 4;
-
-// util for easy adding logs
-const addLog = (message: string, logs: GameState["log"]): GameState["log"] => {
-  return [{ dt: new Date().getTime(), message: message }, ...logs].slice(
-    0,
-    MAX_LOG_SIZE
-  );
-};
+type GameAction =
+  | { type: "guess"; guess: number }
+  | { type: "bet"; amount: number };
 
 export const gameUpdater = (
   action: ServerAction,
@@ -73,7 +75,14 @@ export const gameUpdater = (
         users: state.users.filter((user) => user.id !== action.user.id),
         log: addLog(`user ${action.user.id} left 😢`, state.log),
       };
-
+    case "bet":
+      return {
+        ...state,
+        log: addLog(
+          `user ${action.user.id} betted ${action.amount}!`,
+          state.log
+        ),
+      };
     case "guess":
       if (action.guess === state.target) {
         return {
