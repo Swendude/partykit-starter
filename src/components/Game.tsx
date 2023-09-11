@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useGameRoom } from "@/hooks/useGameRoom";
 import { stringToColor } from "@/utils";
+import { Badge } from "./ui/badge";
 
 interface GameProps {
   username: string;
@@ -34,32 +35,17 @@ const Game = ({ username, roomId }: GameProps) => {
 
   return (
     <>
-      <h1 className="text-2xl border-b border-yellow-400 text-center relative">
-        🎲 Guess the number!
-      </h1>
       <section>
-        <form
-          className="flex flex-col gap-4 py-6 items-center"
-          onSubmit={handleGuess}
-        >
-          <label
-            htmlFor="guess"
-            className="text-7xl font-bold text-stone-50 bg-black rounded p-2 text-"
-          >
-            {guess}
-          </label>
-          <input
-            type="range"
-            name="guess"
-            id="guess"
-            className="opacity-70 hover:opacity-100 accent-yellow-400"
-            onChange={(e) => setGuess(Number(e.currentTarget.value))}
-            value={guess}
-          />
-          <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:animate-wiggle">
-            Guess!
+        {gameState.currentUser === null ? (
+          <button onClick={() => dispatch({ type: "startGame" })}>
+            Start game
           </button>
-        </form>
+        ) : (
+          <p>{`${gameState.currentUser}'s turn`}</p>
+        )}
+        {gameState.rootError && (
+          <p className="text-red-600 font-bold">{gameState.rootError}</p>
+        )}
 
         <div className="border-t border-yellow-400 py-2" />
 
@@ -77,13 +63,12 @@ const Game = ({ username, roomId }: GameProps) => {
         <div className="flex flex-wrap gap-2">
           {gameState.users.map((user) => {
             return (
-              <p
-                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent text-white"
+              <Badge
                 style={{ backgroundColor: stringToColor(user.id + roomId) }}
                 key={user.id}
               >
                 {user.id}
-              </p>
+              </Badge>
             );
           })}
         </div>
