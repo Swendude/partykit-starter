@@ -51,11 +51,7 @@ export const initialGame = () => ({
 });
 
 // Here are all the actions we can dispatch for a user
-;
-
-
 type GameAction = { type: "guess"; guess: string };
-
 
 export const gameUpdater = (
   action: ServerAction,
@@ -67,7 +63,7 @@ export const gameUpdater = (
 
   // Every action has a user field that represent the user who dispatched the action,
   // you don't need to add this yourself
-  
+
   switch (action.type) {
     case "UserEntered":
       return {
@@ -84,15 +80,16 @@ export const gameUpdater = (
       };
 
     case "guess":
+      console.log("target:", state.target);
       if (action.guess === state.target) {
         return {
           ...state,
-          target:
-            hangmanGame[
-              Math.floor(Math.random() * 30) as keyof typeof hangmanGame
-            ],
+          // target:
+          //   hangmanGame[
+          //     Math.floor(Math.random() * 30) as keyof typeof hangmanGame
+          //   ],
           log: addLog(
-            `user ${action.user.id} guessed ${action.guess} and won! 👑`,
+            `user ${action.user.id} guessed ${action.guess} and won!👑`,
             state.log
           ),
         };
@@ -106,4 +103,4 @@ export const gameUpdater = (
         };
       }
   }
-}; */
+};

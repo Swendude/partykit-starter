@@ -1,11 +1,12 @@
 import { initialGame } from "../../game/logic";
 import { useState, useEffect } from "react";
+import { GameState, Action } from "../../game/logic";
 
-function Word() {
+function Word({ gameState }: { gameState: GameState }) {
   const [word, setWord] = useState("");
-
+  console.log(word);
   useEffect(() => {
-    setWord(initialGame().target);
+    setWord(gameState.target);
   }, []);
 
   const wordArray = word.split("");

@@ -10,6 +10,8 @@ interface GameProps {
 
 const Game = ({ username, roomId }: GameProps) => {
   const { gameState, dispatch } = useGameRoom(username, roomId);
+  console.log("Initial Gamestate");
+  console.log({ gameState });
 
   // Local state to use for the UI
   const [guess, setGuess] = useState<string>("");
@@ -30,6 +32,7 @@ const Game = ({ username, roomId }: GameProps) => {
     event.preventDefault();
     // Dispatch allows you to send an action!
     // Modify /game/logic.ts to change what actions you can send
+    console.log({ type: "guess", guess: guess });
     dispatch({ type: "guess", guess: guess });
   };
 
@@ -38,9 +41,9 @@ const Game = ({ username, roomId }: GameProps) => {
       <h1 className="text-2xl border-b border-yellow-400 text-center relative">
         🎲 Guess the letter or the whole word!
       </h1>
-      <Word />
+      <Word gameState={gameState} />
       <section>
-        {/* <form
+        <form
           className="flex flex-col gap-4 py-6 items-center"
           onSubmit={handleGuess}
         >
@@ -61,9 +64,7 @@ const Game = ({ username, roomId }: GameProps) => {
           <button className="rounded border p-5 bg-yellow-400 group text-black shadow hover:shadow-lg transition-all duration-200 hover:animate-wiggle">
             Guess!
           </button>
-        </form> */}
-
-
+        </form>
 
         <div className=" bg-yellow-100 flex flex-col p-4 rounded text-sm">
           {gameState.log.map((logEntry, i) => (
