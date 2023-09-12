@@ -14,13 +14,14 @@ export default class Server implements Party.Server {
     this.gameState = initialGame();
     console.log("Room created:", party.id);
     console.log("Room target", this.gameState.target);
-    // party.storage.put;
   }
-  onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
+
+  onConnect(connection: Party.Connection) {
     // A websocket just connected!
 
     // let's send a message to the connection
     // conn.send();
+    console.log(`connect:`, connection.id);
     this.gameState = gameUpdater(
       { type: "UserEntered", user: { id: connection.id } },
       this.gameState
