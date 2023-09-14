@@ -37,6 +37,9 @@ export default class Server implements Party.Server {
       this.gameState
     );
     this.party.broadcast(JSON.stringify(this.gameState));
+    if (Array.from(this.party.getConnections()).length === 0) {
+      this.gameState = initialGame();
+    }
   }
   onMessage(message: string, sender: Party.Connection) {
     const action: ServerAction = {

@@ -31,10 +31,12 @@ export type Dice =
   | { status: "removed" }
   | { status: "rolled"; value: (typeof DICE_FACES)[number] };
 
-const DICE_FACES: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+export const DICE_FACES: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+
+export type DiceSet = [Dice, Dice, Dice, Dice, Dice];
 
 export interface UserInfo {
-  dice: null | [Dice, Dice, Dice, Dice, Dice];
+  dice: null | DiceSet;
 }
 
 export type infoMapping = Record<User["id"], UserInfo>;

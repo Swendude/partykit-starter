@@ -11,6 +11,7 @@ import { useToast } from "./ui/use-toast";
 import { ResetDialogButton } from "./reset-dialog";
 import { LogView } from "./log-view";
 import { LeaveDialogButton } from "./leave-dialog";
+import { DiceSet } from "./diceset";
 
 interface GameProps {
   username: string;
@@ -48,11 +49,11 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-4 w-[500px]">
       {gameState.currentUser === null ? (
         <>
           <Button
-            className="w-fit"
+            className="w-fit animate-pulse"
             variant={"outline"}
             onClick={() => dispatch({ type: "startGame" })}
           >
@@ -64,22 +65,14 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
           <p>{`${gameState.currentUser}'s turn`}</p>
         </>
       )}
+
       <LogView logs={gameState.log} />
+
       <Separator />
+
       <h2 className="text-2xl">Your dice</h2>
-      <div className="flex gap-4 justify-between">
-        {gameState.userInfo[username] &&
-        gameState.userInfo[username].dice !== null
-          ? gameState.userInfo[username].dice?.map((d, i) => {
-              if (d.status === "rolled") {
-                return <p key={i}>{d.value}</p>;
-              } else {
-                return <p key={i}>?</p>;
-              }
-            })
-          : [...new Array(5)].map((_, i) => (
-              <Square key={i} className="stroke-accent" size={72} />
-            ))}
+      <div>
+        <DiceSet dice={gameState.userInfo[username].dice} />
       </div>
 
       <Separator />
@@ -96,10 +89,12 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
                   {user.id}
                 </CardTitle>
                 <Separator />
-                <CardContent className="flex gap-2 p-0">
-                  {[...new Array(5)].map((_, i) => (
-                    <Square key={i} className="stroke-muted" size={32} />
-                  ))}
+                <CardContent className="p-0">
+                  <DiceSet
+                    dice={gameState.userInfo[user.id].dice}
+                    variant="sm"
+                    hidden
+                  />
                 </CardContent>
               </CardHeader>
             </Card>
