@@ -27,11 +27,13 @@ export type DefaultAction = { type: "UserEntered" } | { type: "UserExit" };
 // If bidder matched: wins
 // all losers remove 1 dice
 
+export const DICE_FACES: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+
+export type DiceFace = (typeof DICE_FACES)[number];
+
 export type Dice =
   | { status: "removed" }
-  | { status: "rolled"; value: (typeof DICE_FACES)[number] };
-
-export const DICE_FACES: (1 | 2 | 3 | 4 | 5 | 6)[] = [1, 2, 3, 4, 5, 6];
+  | { status: "rolled"; value: DiceFace };
 
 export type DiceSet = [Dice, Dice, Dice, Dice, Dice];
 
@@ -41,23 +43,30 @@ export interface UserInfo {
 
 export type infoMapping = Record<User["id"], UserInfo>;
 
-export interface GameState extends BaseGameState {
+type Bet = { amount: number; face: DiceFace; userId: User["id"] };
+
+export type GameState = {
   target: number;
   currentUser: User["id"] | null; //null means game not started
+  currentBet: Bet | null;
   userInfo: infoMapping;
   rootError: string | null;
-}
+} & BaseGameState;
 
 export const initialGame = (): GameState => ({
   users: [],
   userInfo: {},
   currentUser: null,
+  currentBet: null,
   target: Math.floor(Math.random() * 100),
   log: ["Game Created!"],
   rootError: null,
 });
 
-type GameAction = { type: "startGame" } | { type: "resetGame" };
+type GameAction =
+  | { type: "startGame" }
+  | { type: "resetGame" }
+  | { type: "makeBet"; bet: Bet };
 
 export const gameUpdater = (
   action: ServerAction,
@@ -120,6 +129,16 @@ export const gameUpdater = (
         userInfo: resetAllDice(state.userInfo),
         log: [...state.log, `Game reset`],
       };
+
+    case "makeBet":
+      if (action.user.id !== state.currentUser) {
+        return {
+          ...state,
+          rootError: `${action.user.id} tried to make a bet but it's not their turn!`,
+        };
+      } else {
+        return state;
+      }
   }
 };
 

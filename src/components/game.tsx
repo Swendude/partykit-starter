@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGameRoom } from "@/hooks/useGameRoom";
 
-import { Dices, Square, User2 } from "lucide-react";
+import { Dices, User2 } from "lucide-react";
 
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -12,6 +12,7 @@ import { ResetDialogButton } from "./reset-dialog";
 import { LogView } from "./log-view";
 import { LeaveDialogButton } from "./leave-dialog";
 import { DiceSet } from "./diceset";
+import { cn } from "@/lib/utils";
 
 interface GameProps {
   username: string;
@@ -48,23 +49,43 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
     );
   }
 
+  const usersTurn = gameState.currentUser === username;
+
   return (
     <div className="flex flex-col gap-y-4 w-[500px]">
-      {gameState.currentUser === null ? (
-        <>
-          <Button
-            className="w-fit animate-pulse"
-            variant={"outline"}
-            onClick={() => dispatch({ type: "startGame" })}
-          >
-            Click to start game
-          </Button>
-        </>
-      ) : (
-        <>
-          <p>{`${gameState.currentUser}'s turn`}</p>
-        </>
-      )}
+      <div className="mx-auto text-center">
+        <div>
+          {gameState.currentUser === null ? (
+            <>
+              <Button
+                className="w-fit animate-pulse"
+                variant={"outline"}
+                onClick={() => dispatch({ type: "startGame" })}
+              >
+                Click to start game
+              </Button>
+            </>
+          ) : (
+            <p
+              className={cn(
+                "h-10 px-4 py-2 text-2xl",
+                usersTurn && "animate-bounce"
+              )}
+            >{`${usersTurn ? "Your" : `${gameState.currentUser}'s`} turn`}</p>
+          )}
+          {gameState.currentBet ? (
+            <div>
+              <p>
+                The current bet is: {gameState.currentBet.amount} *{" "}
+                {gameState.currentBet.face}
+              </p>
+              <p>Made by: {gameState.currentBet.userId}</p>
+            </div>
+          ) : (
+            <div className="pt-2">No bet yet</div>
+          )}
+        </div>
+      </div>
 
       <LogView logs={gameState.log} />
 
@@ -82,7 +103,12 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
         {gameState.users
           .filter((user) => user.id !== username)
           .map((user) => (
-            <Card key={user.id} className="">
+            <Card
+              key={user.id}
+              className={cn(
+                user.id === gameState.currentUser && "border-white"
+              )}
+            >
               <CardHeader>
                 <CardTitle className="flex gap-2 items-end">
                   <User2 className="inline-block text-end" size={32} />
