@@ -1,20 +1,13 @@
 import { useEffect, useState } from "react";
 import { useGameRoom } from "@/hooks/useGameRoom";
-import { stringToColor } from "@/utils";
-import { Badge } from "./ui/badge";
-import {
-  Dice1,
-  Dices,
-  Square,
-  User2,
-  UserSquare,
-  UserSquare2,
-} from "lucide-react";
+
+import { Dices, Square, User2 } from "lucide-react";
+
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
 import { useToast } from "./ui/use-toast";
-import { ToastAction } from "./ui/toast";
+
 import { ResetDialogButton } from "./reset-dialog";
 import { LogView } from "./log-view";
 import { LeaveDialogButton } from "./leave-dialog";
