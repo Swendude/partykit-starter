@@ -17,6 +17,7 @@ import { useToast } from "./ui/use-toast";
 import { ToastAction } from "./ui/toast";
 import { ResetDialogButton } from "./reset-dialog";
 import { LogView } from "./log-view";
+import { LeaveDialogButton } from "./leave-dialog";
 
 interface GameProps {
   username: string;
@@ -116,7 +117,7 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
 
       <div className="flex justify-between">
         <ResetDialogButton onConfirm={() => dispatch({ type: "resetGame" })} />
-        <Button variant={"ghost"}>Leave Room</Button>
+        <LeaveDialogButton onConfirm={leaveRoom} />
       </div>
     </div>
   );
