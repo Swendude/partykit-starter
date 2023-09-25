@@ -8,9 +8,9 @@ import {
   Dice6,
   XSquare,
 } from "lucide-react";
-import { DICE_FACES, DiceSet as DiceSetT } from "../../game/logic";
+import { DICE_FACES, DiceFace, DiceSet as DiceSetT } from "../../game/logic";
 import { motion } from "framer-motion";
-const faceToIcon = (face: (typeof DICE_FACES)[number]) => {
+export const faceToIcon = (face: DiceFace) => {
   switch (face) {
     case 1:
       return Dice1;

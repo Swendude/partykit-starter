@@ -32,20 +32,21 @@ export default function Home() {
         ) : (
           <>
             <Portal setSetup={setSetup} />
-            <div className="flex">
-              {[...new Array(4)].map((_, i) => (
+            <Separator />
+            <div className="flex gap-2 pt-2">
+              {["Bob", "Alice", "Jane", "Joe"].map((name, i) => (
                 <Button
                   key={i}
                   variant={"outline"}
                   size={"icon"}
                   onClick={() =>
                     setSetup({
-                      username: `${i}`,
+                      username: `${name}`,
                       roomId: "AAAA",
                     })
                   }
                 >
-                  {i}
+                  {name}
                 </Button>
               ))}
             </div>

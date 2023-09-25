@@ -13,6 +13,7 @@ import { LogView } from "./log-view";
 import { LeaveDialogButton } from "./leave-dialog";
 import { DiceSet } from "./diceset";
 import { cn } from "@/lib/utils";
+import { BetForm } from "./bet-form";
 
 interface GameProps {
   username: string;
@@ -54,37 +55,44 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
   return (
     <div className="flex flex-col gap-y-4 w-[500px]">
       <div className="mx-auto text-center">
-        <div>
-          {gameState.currentUser === null ? (
-            <>
-              <Button
-                className="w-fit animate-pulse"
-                variant={"outline"}
-                onClick={() => dispatch({ type: "startGame" })}
-              >
-                Click to start game
-              </Button>
-            </>
-          ) : (
+        {gameState.currentUser === null ? (
+          <>
+            <Button
+              className="w-fit animate-pulse"
+              variant={"outline"}
+              onClick={() => dispatch({ type: "startGame" })}
+            >
+              Click to start game
+            </Button>
+          </>
+        ) : (
+          <>
             <p
               className={cn(
                 "h-10 px-4 py-2 text-2xl",
                 usersTurn && "animate-bounce"
               )}
-            >{`${usersTurn ? "Your" : `${gameState.currentUser}'s`} turn`}</p>
-          )}
-          {gameState.currentBet ? (
-            <div>
-              <p>
-                The current bet is: {gameState.currentBet.amount} *{" "}
-                {gameState.currentBet.face}
-              </p>
-              <p>Made by: {gameState.currentBet.userId}</p>
-            </div>
-          ) : (
-            <div className="pt-2">No bet yet</div>
-          )}
-        </div>
+            >
+              {`${usersTurn ? "Your" : `${gameState.currentUser}'s`} turn`}
+            </p>
+
+            {gameState.currentBet ? (
+              <div>
+                <p>
+                  The current bet is: {gameState.currentBet.amount} *{" "}
+                  {gameState.currentBet.face}
+                </p>
+                <p>Made by: {gameState.currentBet.userId}</p>
+              </div>
+            ) : (
+              <div className="pt-2">No bet yet</div>
+            )}
+
+            <BetForm active={usersTurn} />
+          </>
+        )}
+
+        {usersTurn ? <div></div> : <div></div>}
       </div>
 
       <LogView logs={gameState.log} />
