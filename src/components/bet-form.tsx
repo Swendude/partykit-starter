@@ -15,7 +15,7 @@ import { faceToIcon } from "./diceset";
 import { DiceFace } from "../../game/logic";
 import { Input } from "./ui/input";
 import { useEffect } from "react";
-
+import { motion } from "framer-motion";
 const BetValidator = z.object({
   amount: z.number().int(),
   face: z.union([
@@ -65,97 +65,102 @@ export const BetForm = ({
   };
 
   return (
-    <Form {...betForm}>
-      <BetView bet={{ amount: watchAmount, face: watchFace as Bet["face"] }} />
-      <form
-        onSubmit={betForm.handleSubmit((b) =>
-          onBet({ amount: b.amount, face: b.face as Bet["face"] })
-        )}
-        className=""
-      >
-        <div className="flex mb-2 gap-4">
-          <FormField
-            control={betForm.control}
-            name="amount"
-            render={({ field, fieldState, formState }) => {
-              return (
-                <FormItem className="">
-                  <FormLabel className="sr-only">Amount</FormLabel>
-                  <FormControl>
-                    <>
-                      <Input type="hidden" {...field} />
-                      <div className="flex justify-stretch items-center gap-2">
-                        <Button
-                          type="button"
-                          className="flex-grow py-8"
-                          disabled={field.value === 1}
-                          variant={"outline"}
-                          onClick={() => updateAmount(-1)}
-                        >
-                          Less dice
-                        </Button>
-                        <Button
-                          type="button"
-                          className="flex-grow py-8"
-                          variant={"outline"}
-                          disabled={field.value === maxDice}
-                          onClick={() => updateAmount(1)}
-                        >
-                          More dice
-                        </Button>
-                      </div>
-                    </>
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
-          <FormField
-            control={betForm.control}
-            name="face"
-            render={({ field, fieldState, formState }) => {
-              return (
-                <FormItem className="">
-                  <FormLabel className="sr-only">Face</FormLabel>
-                  <FormControl>
-                    <>
-                      <Input type="hidden" {...field} />
-                      <div className="flex justify-stretch items-center gap-2">
-                        <Button
-                          type="button"
-                          className="flex-grow py-8"
-                          variant={"outline"}
-                          disabled={field.value === 1}
-                          onClick={() => updateFace(-1)}
-                        >
-                          Lower face
-                        </Button>
-                        <Button
-                          type="button"
-                          className="flex-grow py-8"
-                          variant={"outline"}
-                          disabled={field.value === 6}
-                          onClick={() => updateFace(1)}
-                        >
-                          Higher face
-                        </Button>
-                      </div>
-                    </>
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
-          <Button
-            type="submit"
-            className="flex-grow py-8 mt-2"
-            variant={"default"}
-          >
-            Place bet!
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
+      <Form {...betForm}>
+        {current && <BetView bet={current} />}
+        <BetView
+          bet={{ amount: watchAmount, face: watchFace as Bet["face"] }}
+        />
+        <form
+          onSubmit={betForm.handleSubmit((b) =>
+            onBet({ amount: b.amount, face: b.face as Bet["face"] })
+          )}
+          className=""
+        >
+          <div className="flex mb-2 gap-4">
+            <FormField
+              control={betForm.control}
+              name="amount"
+              render={({ field, fieldState, formState }) => {
+                return (
+                  <FormItem className="">
+                    <FormLabel className="sr-only">Amount</FormLabel>
+                    <FormControl>
+                      <>
+                        <Input type="hidden" {...field} />
+                        <div className="flex justify-stretch items-center gap-2">
+                          <Button
+                            type="button"
+                            className="flex-grow py-8"
+                            disabled={field.value === 1}
+                            variant={"outline"}
+                            onClick={() => updateAmount(-1)}
+                          >
+                            Less dice
+                          </Button>
+                          <Button
+                            type="button"
+                            className="flex-grow py-8"
+                            variant={"outline"}
+                            disabled={field.value === maxDice}
+                            onClick={() => updateAmount(1)}
+                          >
+                            More dice
+                          </Button>
+                        </div>
+                      </>
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
+            <FormField
+              control={betForm.control}
+              name="face"
+              render={({ field, fieldState, formState }) => {
+                return (
+                  <FormItem className="">
+                    <FormLabel className="sr-only">Face</FormLabel>
+                    <FormControl>
+                      <>
+                        <Input type="hidden" {...field} />
+                        <div className="flex justify-stretch items-center gap-2">
+                          <Button
+                            type="button"
+                            className="flex-grow py-8"
+                            variant={"outline"}
+                            disabled={field.value === 1}
+                            onClick={() => updateFace(-1)}
+                          >
+                            Lower face
+                          </Button>
+                          <Button
+                            type="button"
+                            className="flex-grow py-8"
+                            variant={"outline"}
+                            disabled={field.value === 6}
+                            onClick={() => updateFace(1)}
+                          >
+                            Higher face
+                          </Button>
+                        </div>
+                      </>
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
+            <Button
+              type="submit"
+              className="flex-grow py-8 mt-2"
+              variant={"default"}
+            >
+              Place bet!
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </motion.div>
   );
 };
 

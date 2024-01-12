@@ -27,13 +27,20 @@ export const faceToIcon = (face: DiceFace) => {
   }
 };
 
+const twSizes = {
+  base: 1,
+  "2xl": 32,
+} as const;
+
+type Size = keyof typeof twSizes;
+
 export const DiceSet = ({
   dice,
-  variant = "md",
+  size = "base",
   hidden = false,
 }: {
   dice: DiceSetT | null;
-  variant?: "md" | "sm";
+  size?: Size;
   hidden?: boolean;
 }) => {
   const fiveTuple = [...new Array(5)];
@@ -45,23 +52,9 @@ export const DiceSet = ({
           <Square
             key={i}
             className="stroke-accent fill-accent"
-            size={variant === "md" ? 72 : 36}
+            size={twSizes[size]}
           />
         ))}
-      </div>
-    );
-  }
-
-  if (hidden) {
-    return (
-      <div className="flex justify-between">
-        {fiveTuple.map((_, i) =>
-          dice[i].status === "removed" ? (
-            <XSquare key={i} className="" size={variant === "md" ? 72 : 36} />
-          ) : (
-            <Square key={i} className="" size={variant === "md" ? 72 : 36} />
-          )
-        )}
       </div>
     );
   }
@@ -82,36 +75,39 @@ export const DiceSet = ({
     >
       {fiveTuple.map((_, i) => {
         const thisDice = dice[i];
-        if (thisDice.status === "removed") {
-          return (
-            <XSquare
-              key={i}
-              className="stroke-accent fill-accent"
-              size={variant === "md" ? 72 : 36}
-            />
-          );
-        } else {
-          const Icon = faceToIcon(thisDice.value);
-          return (
-            <motion.div
-              variants={{
-                hidden: {
-                  opacity: 0,
-                  y: -100,
-                  rotate: 300,
-                },
-                shown: {
-                  opacity: 1,
-                  y: 0,
-                  rotate: 0,
-                },
-              }}
-              key={i}
-            >
-              <Icon key={i} className="" size={variant === "md" ? 72 : 36} />
-            </motion.div>
-          );
-        }
+
+        const Icon = faceToIcon(
+          thisDice.status !== "removed" ? thisDice.value : 1
+        );
+        return (
+          <motion.div
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: -100,
+                rotate: 300,
+              },
+              shown: {
+                opacity: 1,
+                y: 0,
+                rotate: 0,
+              },
+            }}
+            key={i}
+          >
+            {hidden && thisDice.status === "removed" ? (
+              <XSquare
+                key={i}
+                className="opacity-50 fill"
+                size={twSizes[size]}
+              />
+            ) : hidden ? (
+              <Square key={i} className="opacity-50" size={twSizes[size]} />
+            ) : (
+              <Icon key={i} className="" size={twSizes[size]} />
+            )}
+          </motion.div>
+        );
       })}
     </motion.div>
   );

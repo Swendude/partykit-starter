@@ -15,7 +15,7 @@ import { DiceSet } from "./diceset";
 import { cn } from "@/lib/utils";
 import { BetForm } from "./bet-form";
 
-import { numDiceInPlay } from "../../game/logic";
+import { DiceSet as DiceSetT, numDiceInPlay } from "../../game/logic";
 
 interface GameProps {
   username: string;
@@ -56,6 +56,19 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 w-[500px]">
+      <div className="space-y-1">
+        {gameState.users.map((user) => (
+          <Player
+            id={user.id}
+            key={user.id}
+            dice={gameState.userInfo[user.id].dice}
+            self={user.id === username}
+            current={user.id === gameState.currentUser}
+          />
+        ))}
+      </div>
+
+      <Separator />
       <div className="mx-auto text-center">
         {gameState.currentUser === null ? (
           <>
@@ -68,54 +81,23 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
             </Button>
           </>
         ) : (
-          <>
-            <p
-              className={cn(
-                "h-10 px-4 py-2 text-2xl",
-                usersTurn && "animate-bounce"
-              )}
-            >
-              {`${usersTurn ? "Your" : `${gameState.currentUser}'s`} turn`}
-            </p>
-
-            {gameState.currentBet ? (
-              <div>
-                <p>
-                  The current bet is: {gameState.currentBet.amount} *{" "}
-                  {gameState.currentBet.face}
-                </p>
-                <p>Made by: {gameState.currentBet.userId}</p>
-              </div>
-            ) : (
-              <div className="pt-2">No bet yet</div>
-            )}
-
-            {usersTurn && (
-              <BetForm
-                active={usersTurn}
-                current={gameState.currentBet}
-                maxDice={numDiceInPlay(gameState)}
-                onBet={(bet) => dispatch({ type: "makeBet", bet })}
-              />
-            )}
-          </>
+          <BetForm
+            active={usersTurn}
+            current={gameState.currentBet}
+            maxDice={numDiceInPlay(gameState)}
+            onBet={(bet) => dispatch({ type: "makeBet", bet })}
+          />
         )}
-
-        {usersTurn ? <div></div> : <div></div>}
       </div>
 
-      <Separator />
-
-      <h2 className="text-2xl">
+      {/* <h2 className="text-2xl">
         Your dice <span className="text-xs">(playing as {username})</span>
       </h2>
       <div>
         <DiceSet dice={gameState.userInfo[username].dice} />
-      </div>
+      </div> */}
 
-      <Separator />
-
-      <h2 className="text-2xl">Opponent dice</h2>
+      {/* <h2 className="text-2xl">Opponent dice</h2>
       <div className="grid grid-cols-2 gap-2 ">
         {gameState.users
           .filter((user) => user.id !== username)
@@ -142,18 +124,47 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
               </CardHeader>
             </Card>
           ))}
-      </div>
+      </div> */}
+
+      {/* <LogView logs={gameState.log} /> */}
 
       <Separator />
 
-      <LogView logs={gameState.log} />
-
-      <Separator />
-
-      <div className="flex justify-between">
+      <div className="flex justify-between items-end">
         <ResetDialogButton onConfirm={() => dispatch({ type: "resetGame" })} />
+        <p className="text-sm">
+          Room:{" "}
+          <span className="text-secondary bg-primary p-1 px-2 rounded">
+            {roomId}
+          </span>
+        </p>
         <LeaveDialogButton onConfirm={leaveRoom} />
       </div>
+    </div>
+  );
+};
+
+const Player = ({
+  id,
+  dice,
+  current,
+  self,
+}: {
+  id: string;
+  self: boolean;
+  dice: DiceSetT | null;
+  current: boolean;
+}) => {
+  return (
+    <div
+      className={cn(
+        "border rounded-xl p-2 flex gap-4 items-center pl-4 justify-between",
+        current && "border-primary border-2"
+      )}
+    >
+      <h3 className="text-2xl truncate">{id}</h3>
+      {self && <p>(you)</p>}
+      {dice && <DiceSet dice={dice} size="2xl" hidden={!self} />}
     </div>
   );
 };

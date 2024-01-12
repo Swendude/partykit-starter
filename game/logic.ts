@@ -101,8 +101,7 @@ export const gameUpdater = (
       // If only one player left and the game was started
       if (newState.users.length === 1 && newState.currentUser) {
         return {
-          ...newState,
-          currentUser: null,
+          ...resetGame(newState),
           log: [...newState.log, `Single player left in game, game reset`],
         };
       }
@@ -137,12 +136,7 @@ export const gameUpdater = (
       };
 
     case "resetGame":
-      return {
-        ...state,
-        currentUser: null,
-        userInfo: resetAllDice(state.userInfo),
-        log: [...state.log, `Game reset`],
-      };
+      return { ...resetGame(state), log: [...state.log, `Game reset`] };
 
     case "makeBet":
       if (action.user.id !== state.currentUser) {
@@ -173,7 +167,14 @@ export const nextPlayer = (state: GameState): GameState => {
   };
 };
 
-export const numDiceInPlay = (state: GameState) =>
+const resetGame = (game: GameState): GameState => ({
+  ...game,
+  currentUser: null,
+  userInfo: resetAllDice(game.userInfo),
+  currentBet: null,
+});
+
+export const numDiceInPlay = (state: GameState): number =>
   Object.values(state.userInfo)
     .map((userInfo) =>
       userInfo.dice !== null
