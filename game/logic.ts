@@ -46,7 +46,6 @@ export type infoMapping = Record<User["id"], UserInfo>;
 type Bet = { amount: number; face: DiceFace; userId: User["id"] };
 
 export type GameState = {
-  target: number;
   currentUser: User["id"] | null; //null means game not started
   currentBet: Bet | null;
   userInfo: infoMapping;
@@ -58,7 +57,6 @@ export const initialGame = (): GameState => ({
   userInfo: {},
   currentUser: null,
   currentBet: null,
-  target: Math.floor(Math.random() * 100),
   log: ["Game Created!"],
   rootError: null,
 });
@@ -66,7 +64,7 @@ export const initialGame = (): GameState => ({
 type GameAction =
   | { type: "startGame" }
   | { type: "resetGame" }
-  | { type: "makeBet"; bet: Bet };
+  | { type: "makeBet"; bet: Omit<Bet, "userId"> };
 
 export const gameUpdater = (
   action: ServerAction,
@@ -79,7 +77,6 @@ export const gameUpdater = (
       const seen = Object.keys(state.userInfo).find(
         (id) => id === action.user.id
       );
-      console.log(seen);
       if (seen) {
         return {
           ...state,
@@ -94,12 +91,29 @@ export const gameUpdater = (
         log: [...state.log, `user ${action.user.id} joined 🎉`],
       };
 
-    case "UserExit":
-      return {
+    case "UserExit": {
+      const newState = {
         ...state,
         users: state.users.filter((user) => user.id !== action.user.id),
         log: [...state.log, `user ${action.user.id} left 😢`],
       };
+
+      // If only one player left and the game was started
+      if (newState.users.length === 1 && newState.currentUser) {
+        return {
+          ...newState,
+          currentUser: null,
+          log: [...newState.log, `Single player left in game, game reset`],
+        };
+      }
+
+      // If the player that just left was betting, continue player.
+      if (newState.currentUser === action.user.id) {
+        return nextPlayer(newState);
+      }
+
+      return newState;
+    }
 
     case "startGame":
       if (state.users.length < 2) {
@@ -137,10 +151,36 @@ export const gameUpdater = (
           rootError: `${action.user.id} tried to make a bet but it's not their turn!`,
         };
       } else {
-        return state;
+        return nextPlayer({
+          ...state,
+          currentBet: { ...action.bet, userId: action.user.id },
+        });
       }
   }
 };
+
+export const nextPlayer = (state: GameState): GameState => {
+  if (!state.currentUser) {
+    throw new Error("Invalid call to nextPlayer, game hasn't started yet!");
+  }
+  return {
+    ...state,
+    currentUser:
+      state.users[
+        (state.users.map((user) => user.id).indexOf(state.currentUser) + 1) %
+          state.users.length
+      ].id,
+  };
+};
+
+export const numDiceInPlay = (state: GameState) =>
+  Object.values(state.userInfo)
+    .map((userInfo) =>
+      userInfo.dice !== null
+        ? userInfo.dice.filter((v) => v.status !== "removed").length
+        : 0
+    )
+    .reduce((a, b) => a + b);
 
 export const rollAllDice = (info: infoMapping): infoMapping => {
   return Object.keys(info).reduce((acc, userId) => {

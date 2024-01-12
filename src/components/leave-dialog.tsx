@@ -15,7 +15,7 @@ export function LeaveDialogButton({ onConfirm }: { onConfirm: () => void }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant={"ghost"} size={"sm"}>
+        <Button variant={"outline"} size={"sm"}>
           Leave Room
         </Button>
       </AlertDialogTrigger>

@@ -15,7 +15,11 @@ export function ResetDialogButton({ onConfirm }: { onConfirm: () => void }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant={"ghost"} className="hover:bg-destructive" size={"sm"}>
+        <Button
+          variant={"outline"}
+          className="hover:bg-destructive"
+          size={"sm"}
+        >
           Reset Game
         </Button>
       </AlertDialogTrigger>

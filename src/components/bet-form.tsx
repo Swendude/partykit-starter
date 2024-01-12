@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { TypeOf, z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 
 import { Button } from "./ui/button";
@@ -13,13 +13,34 @@ import {
 } from "./ui/select";
 import { faceToIcon } from "./diceset";
 import { DiceFace } from "../../game/logic";
+import { Input } from "./ui/input";
+import { useEffect } from "react";
 
 const BetValidator = z.object({
   amount: z.number().int(),
-  face: z.number().min(1).max(6),
+  face: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+    z.literal(6),
+  ]),
 });
 
-export const BetForm = ({ active }: { active: boolean }) => {
+type Bet = z.infer<typeof BetValidator>;
+
+export const BetForm = ({
+  active,
+  current,
+  maxDice,
+  onBet,
+}: {
+  active: boolean;
+  current: Bet | null;
+  maxDice: number;
+  onBet: (bet: Bet) => void;
+}) => {
   const betForm = useForm({
     resolver: zodResolver(BetValidator),
     defaultValues: {
@@ -28,72 +49,128 @@ export const BetForm = ({ active }: { active: boolean }) => {
     },
   });
 
+  const watchAmount = betForm.watch("amount");
+
+  const updateAmount = (change: number) => {
+    const newValue = watchAmount + change;
+    if (0 < newValue && newValue <= maxDice)
+      betForm.setValue("amount", newValue);
+  };
+
+  const watchFace = betForm.watch("face");
+
+  const updateFace = (change: number) => {
+    const newValue = watchFace + change;
+    if (0 < newValue && newValue < 7) betForm.setValue("face", newValue);
+  };
+
   return (
     <Form {...betForm}>
+      <BetView bet={{ amount: watchAmount, face: watchFace as Bet["face"] }} />
       <form
-        onSubmit={betForm.handleSubmit((data) => console.log(data))}
+        onSubmit={betForm.handleSubmit((b) =>
+          onBet({ amount: b.amount, face: b.face as Bet["face"] })
+        )}
         className=""
       >
-        <FormField
-          control={betForm.control}
-          name="amount"
-          render={({ field, formState, fieldState }) => {
-            return (
-              <FormItem className="">
-                <FormLabel className="sr-only">Amount</FormLabel>
-                <FormControl>
-                  <div className="flex  gap-4 justify-stretch items-center ">
-                    <Button
-                      type="button"
-                      className="flex-grow"
-                      variant={"outline"}
-                      onClick={() => field.onChange(field.value - 1)}
-                    >
-                      -
-                    </Button>
-                    <Button
-                      type="button"
-                      className="flex-grow"
-                      variant={"outline"}
-                      onClick={() => field.onChange(field.value + 1)}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  {/* <Select
-                  onValueChange={(val) => betForm.setValue("face", Number(val))}
-                  defaultValue={"1"}
-                >
-                  <SelectTrigger className="">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[...new Array(6)].map((_, i) => (
-                      <SelectItem key={i} value={(i + 1).toString()}>
-                        {i + 1}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select> */}
-                  {/* <Input {...field} /> */}
-                </FormControl>
-                {/* {fieldState.error && (
-                <FormMessage>{fieldState.error.message}</FormMessage>
-              )} */}
-              </FormItem>
-            );
-          }}
-        />
-        <Button type="submit" variant={"ghost"}>
-          Place bet!
-        </Button>
+        <div className="flex mb-2 gap-4">
+          <FormField
+            control={betForm.control}
+            name="amount"
+            render={({ field, fieldState, formState }) => {
+              return (
+                <FormItem className="">
+                  <FormLabel className="sr-only">Amount</FormLabel>
+                  <FormControl>
+                    <>
+                      <Input type="hidden" {...field} />
+                      <div className="flex justify-stretch items-center gap-2">
+                        <Button
+                          type="button"
+                          className="flex-grow py-8"
+                          disabled={field.value === 1}
+                          variant={"outline"}
+                          onClick={() => updateAmount(-1)}
+                        >
+                          Less dice
+                        </Button>
+                        <Button
+                          type="button"
+                          className="flex-grow py-8"
+                          variant={"outline"}
+                          disabled={field.value === maxDice}
+                          onClick={() => updateAmount(1)}
+                        >
+                          More dice
+                        </Button>
+                      </div>
+                    </>
+                  </FormControl>
+                </FormItem>
+              );
+            }}
+          />
+          <FormField
+            control={betForm.control}
+            name="face"
+            render={({ field, fieldState, formState }) => {
+              return (
+                <FormItem className="">
+                  <FormLabel className="sr-only">Face</FormLabel>
+                  <FormControl>
+                    <>
+                      <Input type="hidden" {...field} />
+                      <div className="flex justify-stretch items-center gap-2">
+                        <Button
+                          type="button"
+                          className="flex-grow py-8"
+                          variant={"outline"}
+                          disabled={field.value === 1}
+                          onClick={() => updateFace(-1)}
+                        >
+                          Lower face
+                        </Button>
+                        <Button
+                          type="button"
+                          className="flex-grow py-8"
+                          variant={"outline"}
+                          disabled={field.value === 6}
+                          onClick={() => updateFace(1)}
+                        >
+                          Higher face
+                        </Button>
+                      </div>
+                    </>
+                  </FormControl>
+                </FormItem>
+              );
+            }}
+          />
+          <Button
+            type="submit"
+            className="flex-grow py-8 mt-2"
+            variant={"default"}
+          >
+            Place bet!
+          </Button>
+        </div>
       </form>
-      <div>
-        {Array.from({ length: betForm.getValues().amount }, (_, i) => {
-          const Icon = faceToIcon(betForm.getValues().face as DiceFace);
-          return <Icon key={i}></Icon>;
-        })}
-      </div>
     </Form>
+  );
+};
+
+const BetView = ({ bet }: { bet: Bet }) => {
+  const FaceIcon = faceToIcon(bet.face);
+
+  return (
+    <div className="border p-1 rounded border-white">
+      <p className="text-4xl text-">
+        {bet.amount}
+        <span className="text-xl">{" x "}</span>
+        <span>
+          <FaceIcon className="inline" size={36} />
+        </span>
+      </p>
+    </div>
   );
 };

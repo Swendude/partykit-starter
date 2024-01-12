@@ -1,4 +1,12 @@
-import { UserInfo, User, rollAllDice, resetAllDice } from "./logic";
+import {
+  UserInfo,
+  User,
+  rollAllDice,
+  resetAllDice,
+  GameState,
+  initialGame,
+  nextPlayer,
+} from "./logic";
 
 const emptyInfo: Record<User["id"], UserInfo> = {
   ["1"]: { dice: null },
@@ -18,4 +26,22 @@ test("resetAllDice resets dice", () => {
   for (let key in rolled) {
     expect(resetAllDice(rolled)[key].dice).toBeNull;
   }
+});
+
+test("nextPlayer selects the next player", () => {
+  const thisGame: GameState = {
+    ...initialGame(),
+    users: [{ id: "Bob" }, { id: "Alice" }, { id: "Joe" }, { id: "Jane" }],
+    currentUser: "Bob",
+  };
+  expect(nextPlayer(thisGame).currentUser).toBe("Alice");
+});
+
+test("nextPlayer selects the next player and loops around", () => {
+  const thisGame: GameState = {
+    ...initialGame(),
+    users: [{ id: "Bob" }, { id: "Alice" }, { id: "Joe" }, { id: "Jane" }],
+    currentUser: "Jane",
+  };
+  expect(nextPlayer(thisGame).currentUser).toBe("Bob");
 });

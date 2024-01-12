@@ -15,6 +15,8 @@ import { DiceSet } from "./diceset";
 import { cn } from "@/lib/utils";
 import { BetForm } from "./bet-form";
 
+import { numDiceInPlay } from "../../game/logic";
+
 interface GameProps {
   username: string;
   roomId: string;
@@ -36,9 +38,9 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
     }
   }, [gameState, toast]);
 
-  useEffect(() => {
-    console.log(gameState);
-  }, [gameState]);
+  // useEffect(() => {
+  //   console.log(gameState);
+  // }, [gameState]);
 
   // Indicated that the game is loading
   if (gameState === null) {
@@ -88,18 +90,25 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
               <div className="pt-2">No bet yet</div>
             )}
 
-            <BetForm active={usersTurn} />
+            {usersTurn && (
+              <BetForm
+                active={usersTurn}
+                current={gameState.currentBet}
+                maxDice={numDiceInPlay(gameState)}
+                onBet={(bet) => dispatch({ type: "makeBet", bet })}
+              />
+            )}
           </>
         )}
 
         {usersTurn ? <div></div> : <div></div>}
       </div>
 
-      <LogView logs={gameState.log} />
-
       <Separator />
 
-      <h2 className="text-2xl">Your dice</h2>
+      <h2 className="text-2xl">
+        Your dice <span className="text-xs">(playing as {username})</span>
+      </h2>
       <div>
         <DiceSet dice={gameState.userInfo[username].dice} />
       </div>
@@ -134,6 +143,10 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
             </Card>
           ))}
       </div>
+
+      <Separator />
+
+      <LogView logs={gameState.log} />
 
       <Separator />
 
