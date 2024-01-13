@@ -13,7 +13,7 @@ import { LogView } from "./log-view";
 import { LeaveDialogButton } from "./leave-dialog";
 import { DiceSet } from "./diceset";
 import { cn } from "@/lib/utils";
-import { BetForm } from "./bet-form";
+import { BetForm, BetView } from "./bet-form";
 
 import { DiceSet as DiceSetT, numDiceInPlay } from "../../game/logic";
 
@@ -56,7 +56,7 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 w-[500px]">
-      <div className="space-y-1">
+      <div className="space-y-2">
         {gameState.users.map((user) => (
           <Player
             id={user.id}
@@ -68,6 +68,15 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
         ))}
       </div>
 
+      <Separator />
+      <div className="flex flex-col items-center">
+        <h3>Current Bet</h3>
+        {gameState.currentBet ? (
+          <BetView bet={gameState.currentBet} />
+        ) : (
+          <p className="text-2xl">No bet yet</p>
+        )}
+      </div>
       <Separator />
       <div className="mx-auto text-center">
         {gameState.currentUser === null ? (
@@ -81,52 +90,21 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
             </Button>
           </>
         ) : (
-          <BetForm
-            active={usersTurn}
-            current={gameState.currentBet}
-            maxDice={numDiceInPlay(gameState)}
-            onBet={(bet) => dispatch({ type: "makeBet", bet })}
-          />
+          <>
+            {usersTurn ? (
+              <h3>Make your Bet</h3>
+            ) : (
+              <h3>{gameState.currentUser}'s turn</h3>
+            )}
+            <BetForm
+              active={usersTurn}
+              current={gameState.currentBet}
+              maxDice={numDiceInPlay(gameState)}
+              onBet={(bet) => dispatch({ type: "makeBet", bet })}
+            />
+          </>
         )}
       </div>
-
-      {/* <h2 className="text-2xl">
-        Your dice <span className="text-xs">(playing as {username})</span>
-      </h2>
-      <div>
-        <DiceSet dice={gameState.userInfo[username].dice} />
-      </div> */}
-
-      {/* <h2 className="text-2xl">Opponent dice</h2>
-      <div className="grid grid-cols-2 gap-2 ">
-        {gameState.users
-          .filter((user) => user.id !== username)
-          .map((user) => (
-            <Card
-              key={user.id}
-              className={cn(
-                user.id === gameState.currentUser && "border-white"
-              )}
-            >
-              <CardHeader>
-                <CardTitle className="flex gap-2 items-end">
-                  <User2 className="inline-block text-end" size={32} />
-                  {user.id}
-                </CardTitle>
-                <Separator />
-                <CardContent className="p-0">
-                  <DiceSet
-                    dice={gameState.userInfo[user.id].dice}
-                    variant="sm"
-                    hidden
-                  />
-                </CardContent>
-              </CardHeader>
-            </Card>
-          ))}
-      </div> */}
-
-      {/* <LogView logs={gameState.log} /> */}
 
       <Separator />
 

@@ -16,6 +16,7 @@ import { DiceFace } from "../../game/logic";
 import { Input } from "./ui/input";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 const BetValidator = z.object({
   amount: z.number().int(),
   face: z.union([
@@ -67,8 +68,8 @@ export const BetForm = ({
   return (
     <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
       <Form {...betForm}>
-        {current && <BetView bet={current} />}
         <BetView
+          active={active}
           bet={{ amount: watchAmount, face: watchFace as Bet["face"] }}
         />
         <form
@@ -92,7 +93,7 @@ export const BetForm = ({
                           <Button
                             type="button"
                             className="flex-grow py-8"
-                            disabled={field.value === 1}
+                            disabled={field.value === 1 || !active}
                             variant={"outline"}
                             onClick={() => updateAmount(-1)}
                           >
@@ -102,7 +103,7 @@ export const BetForm = ({
                             type="button"
                             className="flex-grow py-8"
                             variant={"outline"}
-                            disabled={field.value === maxDice}
+                            disabled={field.value === maxDice || !active}
                             onClick={() => updateAmount(1)}
                           >
                             More dice
@@ -129,7 +130,7 @@ export const BetForm = ({
                             type="button"
                             className="flex-grow py-8"
                             variant={"outline"}
-                            disabled={field.value === 1}
+                            disabled={field.value === 1 || !active}
                             onClick={() => updateFace(-1)}
                           >
                             Lower face
@@ -138,7 +139,7 @@ export const BetForm = ({
                             type="button"
                             className="flex-grow py-8"
                             variant={"outline"}
-                            disabled={field.value === 6}
+                            disabled={field.value === 6 || !active}
                             onClick={() => updateFace(1)}
                           >
                             Higher face
@@ -154,6 +155,7 @@ export const BetForm = ({
               type="submit"
               className="flex-grow py-8 mt-2"
               variant={"default"}
+              disabled={!active}
             >
               Place bet!
             </Button>
@@ -164,12 +166,18 @@ export const BetForm = ({
   );
 };
 
-const BetView = ({ bet }: { bet: Bet }) => {
+export const BetView = ({
+  bet,
+  active = true,
+}: {
+  bet: Bet;
+  active?: boolean;
+}) => {
   const FaceIcon = faceToIcon(bet.face);
 
   return (
-    <div className="border p-1 rounded border-white">
-      <p className="text-4xl text-">
+    <div className={cn("p-1", !active && "opacity-50")}>
+      <p className="text-4xl ">
         {bet.amount}
         <span className="text-xl">{" x "}</span>
         <span>
