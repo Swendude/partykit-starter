@@ -145,12 +145,31 @@ export const gameUpdater = (
           rootError: `${action.user.id} tried to make a bet but it's not their turn!`,
         };
       } else {
-        return nextPlayer({
-          ...state,
-          currentBet: { ...action.bet, userId: action.user.id },
-        });
+        const newBet = { ...action.bet, userId: action.user.id };
+        if (!state.currentBet || betIsHigher(newBet, state.currentBet)) {
+          return nextPlayer({
+            ...state,
+            currentBet: { ...action.bet, userId: action.user.id },
+            log: [...state.log, `${action.user.id} made a bet!`],
+          });
+        } else {
+          return {
+            ...state,
+            rootError: `${action.user.id} tried to make a bet but it was not higher than the previous bet!`,
+          };
+        }
       }
   }
+};
+
+export const betIsHigher = <T extends Omit<Bet, "userId">>(
+  bet1: T,
+  bet2: T
+): boolean => {
+  // Either amount or face is higher
+  if (bet1.face > bet2.face) return true;
+  if (bet1.face === bet2.face && bet1.amount >= bet2.amount) return true;
+  return false;
 };
 
 export const nextPlayer = (state: GameState): GameState => {

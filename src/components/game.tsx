@@ -92,9 +92,12 @@ const Game = ({ username, roomId, leaveRoom }: GameProps) => {
         ) : (
           <>
             {usersTurn ? (
-              <h3>Make your Bet</h3>
+              <h3 className="animate-bounce">Make your Bet</h3>
             ) : (
-              <h3>{gameState.currentUser}'s turn</h3>
+              <h3>
+                {gameState.currentUser}
+                {"'s"} turn
+              </h3>
             )}
             <BetForm
               active={usersTurn}

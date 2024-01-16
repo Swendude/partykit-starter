@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { faceToIcon } from "./diceset";
-import { DiceFace } from "../../game/logic";
+import { DiceFace, betIsHigher } from "../../game/logic";
 import { Input } from "./ui/input";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
@@ -44,11 +44,18 @@ export const BetForm = ({
 }) => {
   const betForm = useForm({
     resolver: zodResolver(BetValidator),
-    defaultValues: {
+    defaultValues: current || {
       amount: 1,
       face: 1,
     },
   });
+
+  useEffect(() => {
+    if (current) {
+      betForm.setValue("amount", current.amount);
+      betForm.setValue("face", current.face);
+    }
+  }, [current, betForm]);
 
   const watchAmount = betForm.watch("amount");
 
@@ -155,7 +162,14 @@ export const BetForm = ({
               type="submit"
               className="flex-grow py-8 mt-2"
               variant={"default"}
-              disabled={!active}
+              disabled={
+                !active ||
+                (current !== null &&
+                  betIsHigher(current, {
+                    amount: watchAmount,
+                    face: watchFace as Bet["face"],
+                  }))
+              }
             >
               Place bet!
             </Button>
