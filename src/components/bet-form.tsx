@@ -1,22 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { TypeOf, z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 
 import { Button } from "./ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+
 import { faceToIcon } from "./diceset";
 import { DiceFace, betIsHigher } from "../../game/logic";
 import { Input } from "./ui/input";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+
 const BetValidator = z.object({
   amount: z.number().int(),
   face: z.union([
@@ -83,7 +84,7 @@ export const BetForm = ({
           onSubmit={betForm.handleSubmit((b) =>
             onBet({ amount: b.amount, face: b.face as Bet["face"] })
           )}
-          className=""
+          className="flex flex-col"
         >
           <div className="flex mb-2 gap-4">
             <FormField
@@ -158,22 +159,25 @@ export const BetForm = ({
                 );
               }}
             />
-            <Button
-              type="submit"
-              className="flex-grow py-8 mt-2"
-              variant={"default"}
-              disabled={
-                !active ||
-                (current !== null &&
-                  betIsHigher(current, {
-                    amount: watchAmount,
-                    face: watchFace as Bet["face"],
-                  }))
-              }
-            >
-              Place bet!
-            </Button>
           </div>
+          <Button
+            type="submit"
+            className="flex-grow mt-2"
+            variant={"default"}
+            disabled={
+              !active ||
+              (current !== null &&
+                betIsHigher(current, {
+                  amount: watchAmount,
+                  face: watchFace as Bet["face"],
+                }))
+            }
+          >
+            Place bet!
+          </Button>
+          <p className="py-4">or</p>
+
+          <Button disabled={!current}>Call bluff</Button>
         </form>
       </Form>
     </motion.div>

@@ -162,6 +162,43 @@ export const gameUpdater = (
   }
 };
 
+export const diceCount = (state: GameState): Record<DiceFace, number> => {
+  return Object.keys(state.userInfo)
+    .map((key) => state.userInfo[key].dice)
+    .filter((set): set is DiceSet => set !== null)
+    .map((set) =>
+      set.filter(
+        (dice): dice is { value: DiceFace; status: "rolled" } =>
+          dice.status === "rolled"
+      )
+    )
+    .reduce(
+      (total, set) => [...total, ...set.map((dice) => dice.value as DiceFace)],
+      [] as DiceFace[]
+    )
+    .reduce((counter, face) => ({ ...counter, [face]: counter[face] + 1 }), {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+      6: 0,
+    });
+};
+
+export const isBetValid = <T extends Omit<Bet, "userId">>(
+  bet: T,
+  state: GameState
+): boolean => {
+  // A bet is valid if there are more dice than the amount betted
+  const counts = diceCount(state);
+  if (counts[bet.face] >= bet.amount) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 export const betIsHigher = <T extends Omit<Bet, "userId">>(
   bet1: T,
   bet2: T

@@ -6,6 +6,7 @@ import {
   GameState,
   initialGame,
   nextPlayer,
+  diceCount,
 } from "./logic";
 
 const emptyInfo: Record<User["id"], UserInfo> = {
@@ -44,4 +45,40 @@ test("nextPlayer selects the next player and loops around", () => {
     currentUser: "Jane",
   };
   expect(nextPlayer(thisGame).currentUser).toBe("Bob");
+});
+
+test("diceCount generates a proper count", () => {
+  const thisGame: GameState = {
+    ...initialGame(),
+    users: [{ id: "Bob" }, { id: "Alice" }],
+    userInfo: {
+      ["Bob"]: {
+        dice: [
+          { status: "rolled", value: 1 },
+          { status: "rolled", value: 1 },
+          { status: "rolled", value: 2 },
+          { status: "rolled", value: 1 },
+          { status: "rolled", value: 4 },
+        ],
+      },
+      ["Alice"]: {
+        dice: [
+          { status: "rolled", value: 6 },
+          { status: "rolled", value: 3 },
+          { status: "rolled", value: 4 },
+          { status: "rolled", value: 1 },
+          { status: "rolled", value: 3 },
+        ],
+      },
+    },
+  };
+
+  expect(diceCount(thisGame)).toEqual({
+    1: 4,
+    2: 1,
+    3: 2,
+    4: 2,
+    5: 0,
+    6: 1,
+  });
 });
